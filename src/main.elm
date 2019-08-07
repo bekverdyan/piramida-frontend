@@ -68,6 +68,9 @@ update msg model =
         CreateAgent ->
             { model
                 | agents = createAgent model.agentName model.agentLevel model.brokerId :: model.agents
+                , agentName = ""
+                , agentLevel = ""
+                , brokerId = ""
             }
 
 
