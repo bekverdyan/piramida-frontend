@@ -1,7 +1,7 @@
 module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
-import Html exposing (Html, button, div, input, li, span, text, ul)
+import Html exposing (Html, button, div, input, li, p, span, text, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 
@@ -88,21 +88,14 @@ view : Model -> Html Msg
 view model =
     div [ style "display" "table" ]
         [ div [ style "display" "table-row" ]
-            [ div [ style "display" "table-cell" ]
-                [ ul [] (toHtmlFunction model.agents) ]
+            [ div [ style "display" "table-cell" ] [ ul [] (toHtmlFunction model.agents) ]
             , div [ style "display" "table-cell" ]
-                [ div []
-                    [ input
-                        [ placeholder "Agent name"
-                        , value model.agentName
-                        , onInput NameInput
-                        ]
-                        []
-                    ]
+                [ div [] [ input [ placeholder "Agent name", value model.agentName, onInput NameInput ] [] ]
                 , div []
                     [ input
                         [ placeholder "Agent level"
                         , value model.agentLevel
+                        , onInput LevelInput
                         ]
                         []
                     ]
@@ -110,6 +103,7 @@ view model =
                     [ input
                         [ placeholder "Broker ID"
                         , value model.brokerId
+                        , onInput BrokerIDInput
                         ]
                         []
                     ]
@@ -126,4 +120,12 @@ toHtmlFunction agents =
 
 myHtmlF : Agent -> Html Msg
 myHtmlF agent =
-    li [] [ text agent.name ]
+    li []
+        [ span []
+            [ text agent.name
+            , text "     "
+            , text agent.level
+            , text "     "
+            , text agent.brokerId
+            ]
+        ]
