@@ -152,22 +152,6 @@ viewConverter detailName agentDetail toMsg =
         ]
 
 
-
--- div []
---     [ span []
---         [ input
---             [ value convertible
---             , onInput toMsg
---             , style "border-color" (drawConvertible converted)
---             ]
---             []
---         , text measurment.convertibleSymbol
---         , span [ style "color" (drawConverted converted) ] [ text (toString converted) ]
---         , text measurment.convertedSymbol
---         ]
---     ]
-
-
 toHtmlFunction : List (Maybe Agent) -> List (Html Msg)
 toHtmlFunction agents =
     List.map myHtmlF agents
