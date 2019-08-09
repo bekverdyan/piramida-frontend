@@ -4,10 +4,12 @@ import Browser
 import Html exposing (Html, button, div, input, li, p, span, text, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Task
+import Time
 
 
 main =
-    Browser.sandbox { init = init, update = update, view = view }
+    Browser.element { init = init, update = update, view = view, subscriptions = always Sub.none }
 
 
 
@@ -15,16 +17,19 @@ main =
 
 
 type alias Model =
-    { agents : List (Maybe Agent)
+    { agents : List Agent
     , agentName : Maybe String
     , agentLevel : Maybe String
     , brokerId : Maybe String
+    , currentTime : String
     }
 
 
-init : Model
-init =
-    Model [] Nothing Nothing Nothing
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( Model [] Nothing Nothing Nothing ""
+    , Cmd.none
+    )
 
 
 type alias Agent =
@@ -44,38 +49,68 @@ type Msg
     | NameInput String
     | LevelInput String
     | BrokerIDInput String
+    | RequestTime
+    | ReceiveTime Time.Posix
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NameInput name ->
-            { model
+            ( { model
                 | agentName = Just name
-            }
+              }
+            , Cmd.none
+            )
 
         LevelInput level ->
-            { model
+            ( { model
                 | agentLevel = Just level
-            }
+              }
+            , Cmd.none
+            )
 
         BrokerIDInput brokerId ->
-            { model
+            ( { model
                 | brokerId = Just brokerId
-            }
+              }
+            , Cmd.none
+            )
 
         CreateAgent ->
-            { model
-                | agents =
-                    if provided model.agentName && provided model.agentLevel && provided model.brokerId then
-                        createAgent model.agentName model.agentLevel model.brokerId :: model.agents
+            ( model
+            , Task.perform ReceiveTime Time.now
+            )
 
-                    else
-                        model.agents
+        RequestTime ->
+            ( model, Task.perform ReceiveTime Time.now )
+
+        ReceiveTime newTime ->
+            let
+                id =
+                    String.fromInt (Time.toMillis Time.utc newTime)
+
+                agent =
+                    createAgent id model.agentName model.agentLevel model.brokerId
+            in
+            ( { model
+                | agents = addAgent agent model.agents
                 , agentName = Nothing
                 , agentLevel = Nothing
                 , brokerId = Nothing
-            }
+              }
+            , Cmd.none
+            )
+
+
+addAgent : Maybe Agent -> List Agent -> List Agent
+addAgent agent agents =
+    case agent of
+        Just validAgent ->
+            validAgent :: agents
+
+        _ ->
+            agents
 
 
 provided : Maybe String -> Bool
@@ -98,19 +133,19 @@ pullInput userInput =
             ""
 
 
-from : String -> String -> String -> Agent
-from name level brokerId =
-    { id = "gg"
+from : String -> String -> String -> String -> Agent
+from id name level brokerId =
+    { id = id
     , name = name
     , level = level
     , brokerId = brokerId
     }
 
 
-createAgent : Maybe String -> Maybe String -> Maybe String -> Maybe Agent
-createAgent name level brokerId =
+createAgent : String -> Maybe String -> Maybe String -> Maybe String -> Maybe Agent
+createAgent id name level brokerId =
     if provided name && provided level && provided brokerId then
-        Just (from (pullInput name) (pullInput level) (pullInput brokerId))
+        Just (from id (pullInput name) (pullInput level) (pullInput brokerId))
 
     else
         Nothing
@@ -152,24 +187,21 @@ viewConverter detailName agentDetail toMsg =
         ]
 
 
-toHtmlFunction : List (Maybe Agent) -> List (Html Msg)
+toHtmlFunction : List Agent -> List (Html Msg)
 toHtmlFunction agents =
     List.map myHtmlF agents
 
 
-myHtmlF : Maybe Agent -> Html Msg
-myHtmlF msg =
-    case msg of
-        Just agent ->
-            li []
-                [ span []
-                    [ text agent.name
-                    , text "     "
-                    , text agent.level
-                    , text "     "
-                    , text agent.brokerId
-                    ]
-                ]
-
-        Nothing ->
-            li [] []
+myHtmlF : Agent -> Html Msg
+myHtmlF agent =
+    li []
+        [ span []
+            [ text agent.id
+            , text "     "
+            , text agent.name
+            , text "     "
+            , text agent.level
+            , text "     "
+            , text agent.brokerId
+            ]
+        ]
