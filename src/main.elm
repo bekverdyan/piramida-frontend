@@ -1,7 +1,7 @@
 module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
-import Html exposing (Html, button, div, input, li, p, span, text, ul)
+import Html exposing (Html, button, div, input, span, table, td, text, th, thead, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Task
@@ -159,14 +159,44 @@ view : Model -> Html Msg
 view model =
     div [ style "display" "table" ]
         [ div [ style "display" "table-row" ]
-            [ div [ style "display" "table-cell" ] [ ul [] (toHtmlFunction model.agents) ]
+            [ div [ style "display" "table-cell" ] [ viewTable model.agents ]
             , div [ style "display" "table-cell" ]
-                [ viewConverter "Agent name" model.agentName NameInput
-                , viewConverter "Agent level" model.agentLevel LevelInput
-                , viewConverter "Broker ID" model.brokerId BrokerIDInput
+                [ viewAgentDetailInput "Agent name" model.agentName NameInput
+                , viewAgentDetailInput "Agent level" model.agentLevel LevelInput
+                , viewAgentDetailInput "Broker ID" model.brokerId BrokerIDInput
                 , viewButton CreateAgent
                 ]
             ]
+        ]
+
+
+viewTable : List Agent -> Html Msg
+viewTable agents =
+    table [] (viewTableHeader :: toTableRows agents)
+
+
+viewTableHeader : Html Msg
+viewTableHeader =
+    thead []
+        [ th [] [ text "ID" ]
+        , th [] [ text "Name" ]
+        , th [] [ text "Level" ]
+        , th [] [ text "Broker ID" ]
+        ]
+
+
+toTableRows : List Agent -> List (Html Msg)
+toTableRows agents =
+    List.map toTableRow agents
+
+
+toTableRow : Agent -> Html Msg
+toTableRow agent =
+    tr []
+        [ td [] [ text agent.id ]
+        , td [] [ text agent.name ]
+        , td [] [ text agent.level ]
+        , td [] [ text agent.brokerId ]
         ]
 
 
@@ -175,8 +205,8 @@ viewButton toMsg =
     div [] [ button [ onClick toMsg ] [ text "Create" ] ]
 
 
-viewConverter : String -> Maybe String -> (String -> Msg) -> Html Msg
-viewConverter detailName agentDetail toMsg =
+viewAgentDetailInput : String -> Maybe String -> (String -> Msg) -> Html Msg
+viewAgentDetailInput detailName agentDetail toMsg =
     div []
         [ input
             [ placeholder detailName
@@ -184,24 +214,4 @@ viewConverter detailName agentDetail toMsg =
             , onInput toMsg
             ]
             []
-        ]
-
-
-toHtmlFunction : List Agent -> List (Html Msg)
-toHtmlFunction agents =
-    List.map myHtmlF agents
-
-
-myHtmlF : Agent -> Html Msg
-myHtmlF agent =
-    li []
-        [ span []
-            [ text agent.id
-            , text "     "
-            , text agent.name
-            , text "     "
-            , text agent.level
-            , text "     "
-            , text agent.brokerId
-            ]
         ]
