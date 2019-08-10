@@ -1,5 +1,6 @@
 module Main exposing (Model, Msg(..), init, main, update, view)
 
+import Agent exposing (Agent, addAgent, createAgent, pullInput)
 import Browser
 import Html exposing (Html, button, div, input, span, table, td, text, th, thead, tr)
 import Html.Attributes exposing (..)
@@ -30,14 +31,6 @@ init _ =
     ( Model [] Nothing Nothing Nothing ""
     , Cmd.none
     )
-
-
-type alias Agent =
-    { id : String
-    , name : String
-    , level : String
-    , brokerId : String
-    }
 
 
 
@@ -101,54 +94,6 @@ update msg model =
               }
             , Cmd.none
             )
-
-
-addAgent : Maybe Agent -> List Agent -> List Agent
-addAgent agent agents =
-    case agent of
-        Just validAgent ->
-            validAgent :: agents
-
-        _ ->
-            agents
-
-
-provided : Maybe String -> Bool
-provided agentDetail =
-    case agentDetail of
-        Just _ ->
-            True
-
-        Nothing ->
-            False
-
-
-pullInput : Maybe String -> String
-pullInput userInput =
-    case userInput of
-        Just name ->
-            name
-
-        Nothing ->
-            ""
-
-
-from : String -> String -> String -> String -> Agent
-from id name level brokerId =
-    { id = id
-    , name = name
-    , level = level
-    , brokerId = brokerId
-    }
-
-
-createAgent : String -> Maybe String -> Maybe String -> Maybe String -> Maybe Agent
-createAgent id name level brokerId =
-    if provided name && provided level && provided brokerId then
-        Just (from id (pullInput name) (pullInput level) (pullInput brokerId))
-
-    else
-        Nothing
 
 
 
