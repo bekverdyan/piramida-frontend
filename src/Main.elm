@@ -1,10 +1,11 @@
 module Main exposing (Model, Msg(..), init, main, update, view)
 
-import Agent exposing (Agent, addAgent, createAgent, pullInput)
+import Agent exposing (..)
 import Browser
 import Html exposing (Html, button, div, input, span, table, td, text, th, thead, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Http
 import Task
 import Time
 
@@ -23,13 +24,31 @@ type alias Model =
     , agentLevel : Maybe String
     , brokerId : Maybe String
     , currentTime : String
+    , apiState : ( Api, Cmd Msg )
+    , response : Maybe String
     }
+
+
+type Api
+    = Failure
+    | Loading
+    | Success String
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model [] Nothing Nothing Nothing ""
+    ( Model [] Nothing Nothing Nothing "" loadAgents Nothing
     , Cmd.none
+    )
+
+
+loadAgents : ( Api, Cmd Msg )
+loadAgents =
+    ( Loading
+    , Http.get
+        { url = "http://localhost:3000/api/agents"
+        , expect = Http.expectString GotText
+        }
     )
 
 
@@ -44,6 +63,7 @@ type Msg
     | BrokerIDInput String
     | RequestTime
     | ReceiveTime Time.Posix
+    | GotText (Result Http.Error String)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -95,6 +115,9 @@ update msg model =
             , Cmd.none
             )
 
+        GotText _ ->
+            ( model, Cmd.none )
+
 
 
 -- VIEW
@@ -106,9 +129,9 @@ view model =
         [ div [ style "display" "table-row" ]
             [ div [ style "display" "table-cell" ] [ viewTable model.agents ]
             , div [ style "display" "table-cell" ]
-                [ viewAgentDetailInput "Agent name" model.agentName NameInput
-                , viewAgentDetailInput "Agent level" model.agentLevel LevelInput
-                , viewAgentDetailInput "Broker ID" model.brokerId BrokerIDInput
+                [ viewInput "Agent name" model.agentName NameInput
+                , viewInput "Agent level" model.agentLevel LevelInput
+                , viewInput "Broker ID" model.brokerId BrokerIDInput
                 , viewButton CreateAgent
                 ]
             ]
@@ -150,8 +173,8 @@ viewButton toMsg =
     div [] [ button [ onClick toMsg ] [ text "Create" ] ]
 
 
-viewAgentDetailInput : String -> Maybe String -> (String -> Msg) -> Html Msg
-viewAgentDetailInput detailName agentDetail toMsg =
+viewInput : String -> Maybe String -> (String -> Msg) -> Html Msg
+viewInput detailName agentDetail toMsg =
     div []
         [ input
             [ placeholder detailName
