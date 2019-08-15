@@ -5,7 +5,6 @@ import Browser
 import Html exposing (Html, button, div, input, node, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
-import Html.String as HtmlString
 import Task
 import Time
 
