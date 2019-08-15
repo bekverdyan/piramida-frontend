@@ -5153,7 +5153,8 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			key,
 			elm$json$Json$Encode$string(string));
 	});
-var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
+var elm$html$Html$Attributes$name = elm$html$Html$Attributes$stringProperty('name');
+var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
@@ -5200,7 +5201,8 @@ var author$project$Main$viewAgentDetailInput = F3(
 					elm$html$Html$input,
 					_List_fromArray(
 						[
-							elm$html$Html$Attributes$placeholder(detailName),
+							elm$html$Html$Attributes$name(detailName),
+							elm$html$Html$Attributes$type_('text'),
 							elm$html$Html$Attributes$value(
 							author$project$Agent$pullInput(agentDetail)),
 							elm$html$Html$Events$onInput(toMsg)
@@ -5283,8 +5285,12 @@ var author$project$Main$toTableRow = function (agent) {
 					]))
 			]));
 };
+var elm$html$Html$tbody = _VirtualDom_node('tbody');
 var author$project$Main$toTableRows = function (agents) {
-	return A2(elm$core$List$map, author$project$Main$toTableRow, agents);
+	return A2(
+		elm$html$Html$tbody,
+		_List_Nil,
+		A2(elm$core$List$map, author$project$Main$toTableRow, agents));
 };
 var elm$html$Html$th = _VirtualDom_node('th');
 var elm$html$Html$thead = _VirtualDom_node('thead');
@@ -5294,32 +5300,38 @@ var author$project$Main$viewTableHeader = A2(
 	_List_fromArray(
 		[
 			A2(
-			elm$html$Html$th,
+			elm$html$Html$tr,
 			_List_Nil,
 			_List_fromArray(
 				[
-					elm$html$Html$text('ID')
-				])),
-			A2(
-			elm$html$Html$th,
-			_List_Nil,
-			_List_fromArray(
-				[
-					elm$html$Html$text('Name')
-				])),
-			A2(
-			elm$html$Html$th,
-			_List_Nil,
-			_List_fromArray(
-				[
-					elm$html$Html$text('Level')
-				])),
-			A2(
-			elm$html$Html$th,
-			_List_Nil,
-			_List_fromArray(
-				[
-					elm$html$Html$text('Broker ID')
+					A2(
+					elm$html$Html$th,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('ID')
+						])),
+					A2(
+					elm$html$Html$th,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Name')
+						])),
+					A2(
+					elm$html$Html$th,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Level')
+						])),
+					A2(
+					elm$html$Html$th,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Broker ID')
+						]))
 				]))
 		]));
 var elm$html$Html$table = _VirtualDom_node('table');
@@ -5327,19 +5339,19 @@ var author$project$Main$viewTable = function (agents) {
 	return A2(
 		elm$html$Html$table,
 		_List_Nil,
-		A2(
-			elm$core$List$cons,
-			author$project$Main$viewTableHeader,
-			author$project$Main$toTableRows(agents)));
+		_List_fromArray(
+			[
+				author$project$Main$viewTableHeader,
+				author$project$Main$toTableRows(agents)
+			]));
 };
-var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
+var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var author$project$Main$view = function (model) {
 	return A2(
 		elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2(elm$html$Html$Attributes$style, 'display', 'table')
+				elm$html$Html$Attributes$class('container')
 			]),
 		_List_fromArray(
 			[
@@ -5347,7 +5359,7 @@ var author$project$Main$view = function (model) {
 				elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2(elm$html$Html$Attributes$style, 'display', 'table-row')
+						elm$html$Html$Attributes$class('row')
 					]),
 				_List_fromArray(
 					[
@@ -5355,17 +5367,7 @@ var author$project$Main$view = function (model) {
 						elm$html$Html$div,
 						_List_fromArray(
 							[
-								A2(elm$html$Html$Attributes$style, 'display', 'table-cell')
-							]),
-						_List_fromArray(
-							[
-								author$project$Main$viewTable(model.agents)
-							])),
-						A2(
-						elm$html$Html$div,
-						_List_fromArray(
-							[
-								A2(elm$html$Html$Attributes$style, 'display', 'table-cell')
+								elm$html$Html$Attributes$class('column column-20')
 							]),
 						_List_fromArray(
 							[
@@ -5373,6 +5375,16 @@ var author$project$Main$view = function (model) {
 								A3(author$project$Main$viewAgentDetailInput, 'Agent level', model.agentLevel, author$project$Main$LevelInput),
 								A3(author$project$Main$viewAgentDetailInput, 'Broker ID', model.brokerId, author$project$Main$BrokerIDInput),
 								author$project$Main$viewButton(author$project$Main$CreateAgent)
+							])),
+						A2(
+						elm$html$Html$div,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('column')
+							]),
+						_List_fromArray(
+							[
+								author$project$Main$viewTable(model.agents)
 							]))
 					]))
 			]));

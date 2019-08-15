@@ -2,9 +2,10 @@ module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Agent exposing (Agent, addAgent, createAgent, pullInput)
 import Browser
-import Html exposing (Html, button, div, input, span, table, td, text, th, thead, tr)
+import Html exposing (Html, button, div, input, node, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Html.String as HtmlString
 import Task
 import Time
 
@@ -102,37 +103,39 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ style "display" "table" ]
-        [ div [ style "display" "table-row" ]
-            [ div [ style "display" "table-cell" ] [ viewTable model.agents ]
-            , div [ style "display" "table-cell" ]
+    div [ class "container" ]
+        [ div [ class "row" ]
+            [ div [ class "column column-20" ]
                 [ viewAgentDetailInput "Agent name" model.agentName NameInput
                 , viewAgentDetailInput "Agent level" model.agentLevel LevelInput
                 , viewAgentDetailInput "Broker ID" model.brokerId BrokerIDInput
                 , viewButton CreateAgent
                 ]
+            , div [ class "column" ] [ viewTable model.agents ]
             ]
         ]
 
 
 viewTable : List Agent -> Html Msg
 viewTable agents =
-    table [] (viewTableHeader :: toTableRows agents)
+    table [] [ viewTableHeader, toTableRows agents ]
 
 
 viewTableHeader : Html Msg
 viewTableHeader =
     thead []
-        [ th [] [ text "ID" ]
-        , th [] [ text "Name" ]
-        , th [] [ text "Level" ]
-        , th [] [ text "Broker ID" ]
+        [ tr []
+            [ th [] [ text "ID" ]
+            , th [] [ text "Name" ]
+            , th [] [ text "Level" ]
+            , th [] [ text "Broker ID" ]
+            ]
         ]
 
 
-toTableRows : List Agent -> List (Html Msg)
+toTableRows : List Agent -> Html Msg
 toTableRows agents =
-    List.map toTableRow agents
+    tbody [] (List.map toTableRow agents)
 
 
 toTableRow : Agent -> Html Msg
@@ -154,7 +157,8 @@ viewAgentDetailInput : String -> Maybe String -> (String -> Msg) -> Html Msg
 viewAgentDetailInput detailName agentDetail toMsg =
     div []
         [ input
-            [ placeholder detailName
+            [ name detailName
+            , type_ "text"
             , value (pullInput agentDetail)
             , onInput toMsg
             ]
