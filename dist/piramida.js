@@ -6323,6 +6323,7 @@ var author$project$Main$viewTable = function (agents) {
 				author$project$Main$toTableRows(agents)
 			]));
 };
+var elm$html$Html$label = _VirtualDom_node('label');
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var author$project$Main$view = function (model) {
 	return A2(
@@ -6349,6 +6350,13 @@ var author$project$Main$view = function (model) {
 							]),
 						_List_fromArray(
 							[
+								A2(
+								elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('Create new Agent')
+									])),
 								A3(author$project$Main$viewAgentDetailInput, 'Agent name', model.agentName, author$project$Main$NameInput),
 								A3(author$project$Main$viewAgentDetailInput, 'Agent level', model.agentLevel, author$project$Main$LevelInput),
 								A3(author$project$Main$viewAgentDetailInput, 'Broker ID', model.brokerId, author$project$Main$BrokerIDInput),
