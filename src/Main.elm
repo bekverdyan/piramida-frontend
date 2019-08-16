@@ -2,7 +2,7 @@ module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Agent exposing (Agent, addAgent, createAgent, pullInput)
 import Browser
-import Html exposing (Html, button, div, input, node, span, table, tbody, td, text, th, thead, tr)
+import Html exposing (Html, button, div, input, label, node, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -128,7 +128,8 @@ view model =
     div [ class "container" ]
         [ div [ class "row" ]
             [ div [ class "column column-20" ]
-                [ viewAgentDetailInput "Agent name" model.agentName NameInput
+                [ label [] [ text "Create new Agent" ]
+                , viewAgentDetailInput "Agent name" model.agentName NameInput
                 , viewAgentDetailInput "Agent level" model.agentLevel LevelInput
                 , viewAgentDetailInput "Broker ID" model.brokerId BrokerIDInput
                 , viewButton CreateAgent
